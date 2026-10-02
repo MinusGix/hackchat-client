@@ -272,6 +272,7 @@ export function ChatManager({
       ref={scrollContainerRef}
       onScroll={handleScroll}
       onClick={handleChatClick}
+      data-testid="chat-scroll"
     >
       {welcomeMessage}
       {messageElements}

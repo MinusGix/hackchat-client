@@ -4,3 +4,7 @@ build
 node_modules
 stats.json
 /.idea/
+
+# Playwright
+/test-results/
+/playwright-report/

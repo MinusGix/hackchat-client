@@ -17,6 +17,15 @@ The default client that is webpacked and distributed in the [main](https://githu
 1. Launch: `npm start`
 1. Open browser to: [http://127.0.0.1:3000/](http://127.0.0.1:3000/)
 
+## Testing
+
+- Unit tests (Jest + jsdom): `npm test`
+- Browser tests (Playwright): `npm run test:e2e`
+
+The browser tests cover layout, scrolling and connection behaviour that jsdom can't model. They start the dev server themselves and fake the hack.chat websocket, so no server or network access is needed. Run `npx playwright install chromium` once, or point `CHROME_PATH` at an installed Chrome instead.
+
+Known bugs are tracked as tests marked `test.fail`, which pass while the bug exists and start failing once it's fixed. When you fix one, remove its `test.fail` line. Set `E2E_SHOW_KNOWN=1` to run them normally and see the actual failures.
+
 ## Live Deployment Installation
 
 See [DEPLOY.md](documentation/DEPLOY.md)

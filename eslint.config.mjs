@@ -108,6 +108,14 @@ export default [
     },
   },
   {
+    // Playwright tests run in Node, not the browser bundle
+    files: ["e2e/**/*.js", "playwright.config.js"],
+    rules: {
+      "import/no-nodejs-modules": 0,
+      "no-await-in-loop": 0,
+    },
+  },
+  {
     ignores: ["**/*.test.js"],
   },
 ];
