@@ -3,7 +3,7 @@
  * the hackchat-engine
  */
 
-import { eventChannel } from 'redux-saga';
+import { buffers, eventChannel } from 'redux-saga';
 import {
   take,
   call,
@@ -107,8 +107,36 @@ export function* handleIncomingSignRequest(action) {
   }
 }
 
+/**
+ * Wraps an eventChannel emitter so that events arriving close together are
+ * emitted in one task. React then renders once for the whole group rather
+ * than once per message, which matters in busy channels where each render
+ * walks the full message history. When idle this only adds a timer tick.
+ */
+const batchEmitter = (emit) => {
+  let queue = [];
+  let scheduled = false;
+
+  const flush = () => {
+    const events = queue;
+    queue = [];
+    scheduled = false;
+    events.forEach(emit);
+  };
+
+  return (event) => {
+    queue.push(event);
+    if (!scheduled) {
+      scheduled = true;
+      setTimeout(flush, 0);
+    }
+  };
+};
+
 function initWebsocket() {
-  return eventChannel((emitter) => {
+  // buffered so that a batch emitted at once is never dropped
+  return eventChannel((emitEvent) => {
+    const emitter = batchEmitter(emitEvent);
     const onError = () => emitter({ type: CONNECTION_ERROR, data: {} });
 
     const onConnected = () => {
@@ -469,7 +497,7 @@ function initWebsocket() {
       hcClient.removeListener('updateMessage', onUpdateMessage);
       hcClient.removeListener('gotPasswordReq', onGotPasswordReq);
     };
-  });
+  }, buffers.expanding(64));
 }
 
 export default function* communicationProviderSaga() {

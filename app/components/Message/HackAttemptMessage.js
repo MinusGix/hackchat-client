@@ -4,18 +4,15 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 
-import { selectSettingsPageDomain } from '../../containers/SettingsPage/selectors';
+import { useDisplaySettings } from 'utils/displaySettings';
 import messages from './messages';
 
 import HackStyle from './HackStyle';
 import ActionLink from './ActionLink';
 
 const HackAttemptMessage = ({ payload, intl }) => {
-  const allowExtCode = useSelector(
-    (state) => selectSettingsPageDomain(state).allowExternalCode ?? false,
-  );
+  const { allowExternalCode: allowExtCode } = useDisplaySettings();
 
   if (!allowExtCode) {
     return null;
