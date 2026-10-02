@@ -3,37 +3,38 @@
  */
 
 import React from 'react';
-import { render } from '@testing-library/react';
-import { IntlProvider } from 'react-intl';
-import { Provider } from 'react-redux';
-import { browserHistory } from 'react-router-dom';
 
-import configureStore from '../../../configureStore';
+import renderWithProviders from '../../../../internals/testing/renderWithProviders';
+import MainMenu from '../index';
 
-import { MainMenu } from '../index';
-import { DEFAULT_LOCALE } from '../../../i18n';
-
-const messages = require('../messages');
-const intlProvider = new IntlProvider({ locale: 'en', messages }, {});
-const { intl } = intlProvider.getChildContext();
+const channelData = {
+  programming: {
+    users: {
+      1: { userid: 1, username: 'alice', online: true, mine: true },
+      2: { userid: 2, username: 'bob', online: true },
+      3: { userid: 3, username: 'carol', online: false },
+    },
+  },
+  lounge: { users: {} },
+};
 
 describe('<MainMenu />', () => {
-  let store;
-
-  beforeAll(() => {
-    store = configureStore({}, browserHistory);
-  });
-
-  it('Expect to not log errors in console', () => {
+  it('should render without logging errors', () => {
     const spy = jest.spyOn(global.console, 'error');
-    const dispatch = jest.fn();
-    render(
-      <Provider store={store}>
-        <IntlProvider locale={DEFAULT_LOCALE}>
-          <MainMenu dispatch={dispatch} intl={intl} />
-        </IntlProvider>
-      </Provider>,
+    renderWithProviders(
+      <MainMenu channel="programming" channelData={channelData} />,
     );
     expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it('should list joined channels and only online users', () => {
+    const { queryByText } = renderWithProviders(
+      <MainMenu channel="programming" channelData={channelData} />,
+    );
+    expect(queryByText('lounge')).not.toBeNull();
+    expect(queryByText('alice')).not.toBeNull();
+    expect(queryByText('bob')).not.toBeNull();
+    expect(queryByText('carol')).toBeNull();
   });
 });

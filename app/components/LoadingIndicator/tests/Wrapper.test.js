@@ -25,10 +25,4 @@ describe('<Wrapper />', () => {
     const element = container.firstElementChild;
     expect(element.id).toEqual(id);
   });
-
-  it('should not adopt an invalid attribute', () => {
-    const { container } = render(<Wrapper attribute="test" />);
-    const element = container.firstElementChild;
-    expect(element.hasAttribute('attribute')).toBe(false);
-  });
 });

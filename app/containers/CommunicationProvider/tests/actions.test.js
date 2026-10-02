@@ -5,182 +5,140 @@
 import {
   changeChannel,
   joinChannel,
+  leaveChannel,
+  changeColor,
   sendChat,
   enableCaptcha,
   disableCaptcha,
   lockChannel,
   unlockChannel,
   inviteUser,
-  whisperUser,
   ignoreUser,
+  unignoreUser,
   kickUser,
   banUser,
   muteUser,
   unmuteUser,
-  pushNotif,
-  clearNotifs,
+  uwuifyUser,
+  clearChannel,
+  clearAuthReqs,
 } from '../actions';
 import {
   CHANGE_CHANNEL,
   START_JOIN,
+  LEAVE_CHANNEL,
+  CHANGE_COLOR,
   SEND_CHAT,
   ENABLE_CAPTCHA,
   DISABLE_CAPTCHA,
   LOCK_CHANNEL,
   UNLOCK_CHANNEL,
   INVITE_USER,
-  WHISPER_USER,
   IGNORE_USER,
+  UNIGNORE_USER,
   KICK_USER,
   BAN_USER,
   MUTE_USER,
   UNMUTE_USER,
-  PUSH_NOTIF,
-  CLEAR_NOTIFS,
+  UWUIFY_USER,
+  CLEAR_CHANNEL,
+  CLEAR_AUTH_REQS,
 } from '../constants';
 
 describe('CommunicationProvider actions', () => {
-  describe('Change current channel', () => {
+  describe('Channel actions', () => {
     it('has a type of CHANGE_CHANNEL', () => {
-      const expected = {
+      expect(changeChannel('lounge')).toEqual({
         type: CHANGE_CHANNEL,
-      };
-      expect(changeChannel()).toEqual(expected);
+        channel: 'lounge',
+      });
     });
-  });
 
-  describe('Initiate join', () => {
     it('has a type of START_JOIN', () => {
-      const expected = {
+      expect(joinChannel('bob', 'pw', 'lounge', 'ff0000')).toEqual({
         type: START_JOIN,
-      };
-      expect(joinChannel()).toEqual(expected);
+        username: 'bob',
+        password: 'pw',
+        channel: 'lounge',
+        color: 'ff0000',
+      });
     });
-  });
 
-  describe('Send channel message', () => {
+    it('has a type of LEAVE_CHANNEL', () => {
+      expect(leaveChannel('lounge')).toEqual({
+        type: LEAVE_CHANNEL,
+        channel: 'lounge',
+      });
+    });
+
+    it('has a type of CHANGE_COLOR', () => {
+      expect(changeColor('ff0000', 'lounge')).toEqual({
+        type: CHANGE_COLOR,
+        color: 'ff0000',
+        channel: 'lounge',
+      });
+    });
+
     it('has a type of SEND_CHAT', () => {
-      const expected = {
+      expect(sendChat('lounge', 'hi')).toEqual({
         type: SEND_CHAT,
-      };
-      expect(sendChat()).toEqual(expected);
+        channel: 'lounge',
+        message: 'hi',
+      });
+    });
+
+    it('has a type of CLEAR_CHANNEL', () => {
+      expect(clearChannel('lounge')).toEqual({
+        type: CLEAR_CHANNEL,
+        channel: 'lounge',
+      });
+    });
+
+    it('has a type of CLEAR_AUTH_REQS', () => {
+      expect(clearAuthReqs()).toEqual({ type: CLEAR_AUTH_REQS });
     });
   });
 
-  describe('Enabling captcha', () => {
-    it('has a type of ENABLE_CAPTCHA', () => {
-      const expected = {
-        type: ENABLE_CAPTCHA,
-      };
-      expect(enableCaptcha()).toEqual(expected);
+  describe('Moderation actions taking a channel', () => {
+    it.each([
+      [enableCaptcha, ENABLE_CAPTCHA],
+      [disableCaptcha, DISABLE_CAPTCHA],
+      [lockChannel, LOCK_CHANNEL],
+      [unlockChannel, UNLOCK_CHANNEL],
+    ])('%p has the right type', (creator, type) => {
+      expect(creator('lounge')).toEqual({ type, channel: 'lounge' });
     });
   });
 
-  describe('Disabling captcha', () => {
-    it('has a type of DISABLE_CAPTCHA', () => {
-      const expected = {
-        type: DISABLE_CAPTCHA,
-      };
-      expect(disableCaptcha()).toEqual(expected);
+  describe('User actions taking a userid', () => {
+    it.each([
+      [inviteUser, INVITE_USER],
+      [ignoreUser, IGNORE_USER],
+      [unignoreUser, UNIGNORE_USER],
+    ])('%p has the right type', (creator, type) => {
+      expect(creator('lounge', 42)).toEqual({
+        type,
+        channel: 'lounge',
+        userid: 42,
+      });
     });
   });
 
-  describe('Locking channel', () => {
-    it('has a type of LOCK_CHANNEL', () => {
-      const expected = {
-        type: LOCK_CHANNEL,
-      };
-      expect(lockChannel()).toEqual(expected);
-    });
-  });
+  describe('User actions taking a user', () => {
+    const user = { userid: 42, username: 'bob' };
 
-  describe('Unlocking channel', () => {
-    it('has a type of UNLOCK_CHANNEL', () => {
-      const expected = {
-        type: UNLOCK_CHANNEL,
-      };
-      expect(unlockChannel()).toEqual(expected);
-    });
-  });
-
-  describe('Inviting a user', () => {
-    it('has a type of INVITE_USER', () => {
-      const expected = {
-        type: INVITE_USER,
-      };
-      expect(inviteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Whispering a user', () => {
-    it('has a type of WHISPER_USER', () => {
-      const expected = {
-        type: WHISPER_USER,
-      };
-      expect(whisperUser()).toEqual(expected);
-    });
-  });
-
-  describe('Ignoring a user', () => {
-    it('has a type of IGNORE_USER', () => {
-      const expected = {
-        type: IGNORE_USER,
-      };
-      expect(ignoreUser()).toEqual(expected);
-    });
-  });
-
-  describe('Kicking a user', () => {
-    it('has a type of KICK_USER', () => {
-      const expected = {
-        type: KICK_USER,
-      };
-      expect(kickUser()).toEqual(expected);
-    });
-  });
-
-  describe('Banning a user', () => {
-    it('has a type of BAN_USER', () => {
-      const expected = {
-        type: BAN_USER,
-      };
-      expect(banUser()).toEqual(expected);
-    });
-  });
-
-  describe('Muting a user', () => {
-    it('has a type of MUTE_USER', () => {
-      const expected = {
-        type: MUTE_USER,
-      };
-      expect(muteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Unmuting a user', () => {
-    it('has a type of UNMUTE_USER', () => {
-      const expected = {
-        type: UNMUTE_USER,
-      };
-      expect(unmuteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Adding a notification', () => {
-    it('has a type of PUSH_NOTIF', () => {
-      const expected = {
-        type: PUSH_NOTIF,
-      };
-      expect(pushNotif()).toEqual(expected);
-    });
-  });
-
-  describe('Clearning notifications', () => {
-    it('has a type of CLEAR_NOTIFS', () => {
-      const expected = {
-        type: CLEAR_NOTIFS,
-      };
-      expect(clearNotifs()).toEqual(expected);
+    it.each([
+      [kickUser, KICK_USER],
+      [banUser, BAN_USER],
+      [muteUser, MUTE_USER],
+      [unmuteUser, UNMUTE_USER],
+      [uwuifyUser, UWUIFY_USER],
+    ])('%p has the right type', (creator, type) => {
+      expect(creator('lounge', user)).toEqual({
+        type,
+        channel: 'lounge',
+        user,
+      });
     });
   });
 });

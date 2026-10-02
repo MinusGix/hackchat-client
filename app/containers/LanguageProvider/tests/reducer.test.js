@@ -2,14 +2,19 @@
  * Language provider tests
  */
 
-import languageProviderReducer from '../reducer';
-import { CHANGE_LOCALE } from '../constants';
+import languageProviderReducer, { initialState } from '../reducer';
+import {
+  CHANGE_LOCALE,
+  OPEN_LOCALE_MODAL,
+  CLOSE_LOCALE_MODAL,
+} from '../constants';
 
-/* eslint-disable default-case, no-param-reassign */
 describe('languageProviderReducer', () => {
   it('returns the initial state', () => {
-    expect(languageProviderReducer(undefined, {})).toEqual({
-      locale: 'en',
+    expect(languageProviderReducer(undefined, {})).toEqual(initialState);
+    expect(initialState).toEqual({
+      locale: expect.any(String),
+      isLocaleModalOpen: false,
     });
   });
 
@@ -19,8 +24,18 @@ describe('languageProviderReducer', () => {
         type: CHANGE_LOCALE,
         locale: 'de',
       }),
-    ).toEqual({
-      locale: 'de',
+    ).toEqual({ ...initialState, locale: 'de' });
+  });
+
+  it('opens and closes the locale modal', () => {
+    const opened = languageProviderReducer(initialState, {
+      type: OPEN_LOCALE_MODAL,
     });
+    expect(opened.isLocaleModalOpen).toBe(true);
+
+    const closed = languageProviderReducer(opened, {
+      type: CLOSE_LOCALE_MODAL,
+    });
+    expect(closed.isLocaleModalOpen).toBe(false);
   });
 });

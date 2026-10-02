@@ -6,10 +6,9 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import { Provider } from 'react-redux';
-import { browserHistory } from 'react-router-dom';
 
 import ConnectedLanguageProvider, { LanguageProvider } from '../index';
-import configureStore from '../../../configureStore';
+import setupStore from '../../../setupStore';
 
 import { translationMessages } from '../../../i18n';
 
@@ -37,7 +36,7 @@ describe('<ConnectedLanguageProvider />', () => {
   let store;
 
   beforeAll(() => {
-    store = configureStore({}, browserHistory);
+    store = setupStore();
   });
 
   it('should render the default language messages', () => {

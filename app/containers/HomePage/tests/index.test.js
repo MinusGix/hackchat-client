@@ -3,67 +3,57 @@
  */
 
 import React from 'react';
-import { render } from '@testing-library/react';
-import { IntlProvider } from 'react-intl';
-import { Provider } from 'react-redux';
-import { browserHistory, BrowserRouter as Router } from 'react-router-dom';
 
-import { HomePage, mapDispatchToProps } from '../index';
-import configureStore from '../../../configureStore';
-import { DEFAULT_LOCALE } from '../../../i18n';
+import renderWithProviders from '../../../../internals/testing/renderWithProviders';
+import HomePage, { mapDispatchToProps } from '../index';
+import {
+  sendChat,
+  leaveChannel,
+  clearChannel,
+  changeChannel,
+} from '../../CommunicationProvider/actions';
+import { checkChannelInfo } from '../../WalletLayer/actions';
 
 describe('<HomePage />', () => {
-  let store;
-
-  beforeAll(() => {
-    store = configureStore({}, browserHistory);
-  });
-
-  const location = {
-    search: '',
-  };
-
-  const meta = {
-    channels: {},
-  };
-
-  it('Expect to not log errors in console', () => {
+  it('should render the landing page without logging errors', () => {
     const spy = jest.spyOn(global.console, 'error');
-    const dispatch = jest.fn();
-    const onOpenJoinModal = jest.fn();
-    render(
-      <Router>
-        <Provider store={store}>
-          <IntlProvider locale={DEFAULT_LOCALE}>
-            <HomePage
-              dispatch={dispatch}
-              location={location}
-              channel={false}
-              meta={meta}
-              onOpenJoinModal={onOpenJoinModal}
-            />
-          </IntlProvider>
-        </Provider>
-      </Router>,
-    );
+    const { getByRole } = renderWithProviders(<HomePage />);
+    expect(
+      getByRole('button', { name: 'Create or join a channel' }),
+    ).not.toBeNull();
     expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   describe('mapDispatchToProps', () => {
-    describe('onChannelChange', () => {
-      it('should be injected', () => {
-        const dispatch = jest.fn();
-        const result = mapDispatchToProps(dispatch);
-        expect(result.onChannelChange).toBeDefined();
-      });
+    let dispatch;
+    let props;
+
+    beforeEach(() => {
+      dispatch = jest.fn();
+      props = mapDispatchToProps(dispatch);
     });
 
-    describe('onOpenJoinModal', () => {
-      it('should be injected', () => {
-        const dispatch = jest.fn();
-        const result = mapDispatchToProps(dispatch);
-        expect(result.onOpenJoinModal).toBeDefined();
-      });
+    it('should dispatch channel changes', () => {
+      props.onChangeChannel('lounge');
+      expect(dispatch).toHaveBeenCalledWith(changeChannel('lounge'));
+    });
+
+    it('should send ordinary messages as chat', () => {
+      props.onSendMessage('lounge', 'hello');
+      expect(dispatch).toHaveBeenCalledWith(sendChat('lounge', 'hello'));
+    });
+
+    it('should handle client-side slash commands locally', () => {
+      props.onSendMessage('lounge', '/leave');
+      props.onSendMessage('lounge', ' /clear ');
+      props.onSendMessage('lounge', '/channelinfo');
+
+      expect(dispatch.mock.calls.map(([action]) => action)).toEqual([
+        leaveChannel('lounge'),
+        clearChannel('lounge'),
+        checkChannelInfo('lounge'),
+      ]);
     });
   });
 });

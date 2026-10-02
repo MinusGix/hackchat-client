@@ -2,21 +2,28 @@
  * Main menu tests
  */
 
-import { selectMainMenuDomain } from '../selectors';
+import {
+  selectMainMenuDomain,
+  makeSelectMainMenuStatus,
+  makeSelectLocaleMenuStatus,
+} from '../selectors';
+import { initialState } from '../reducer';
 
 describe('selectMainMenuDomain', () => {
-  it('should select the home state', () => {
+  it('should select the main menu state', () => {
     const mainMenuState = {
-      mainMenuOpen: false,
-      usersModalOpen: false,
-      channelsModalOpen: false,
-      joinModalOpen: false,
-      joinModalChannel: false,
+      mainMenuOpen: true,
       localeModelOpen: false,
     };
     const mockedState = {
       mainMenu: mainMenuState,
     };
     expect(selectMainMenuDomain(mockedState)).toEqual(mainMenuState);
+    expect(makeSelectMainMenuStatus()(mockedState)).toBe(true);
+    expect(makeSelectLocaleMenuStatus()(mockedState)).toBe(false);
+  });
+
+  it('should fall back to the initial state', () => {
+    expect(selectMainMenuDomain({})).toBe(initialState);
   });
 });

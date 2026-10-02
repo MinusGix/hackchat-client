@@ -4,13 +4,12 @@
  * Injection helper tests
  */
 
-import { memoryHistory } from 'react-router-dom';
 import React from 'react';
 import { Provider } from 'react-redux';
 import renderer from 'react-test-renderer';
 import { render } from '@testing-library/react';
 
-import configureStore from '../../configureStore';
+import setupStore from '../../setupStore';
 import injectReducer, { useInjectReducer } from '../injectReducer';
 import * as reducerInjectors from '../reducerInjectors';
 
@@ -28,7 +27,7 @@ describe('injectReducer decorator', () => {
   });
 
   beforeEach(() => {
-    store = configureStore({}, memoryHistory);
+    store = setupStore();
     injectors = {
       injectReducer: jest.fn(),
     };
@@ -56,16 +55,15 @@ describe('injectReducer decorator', () => {
 
   it('should propagate props', () => {
     const props = { testProp: 'test' };
-    const renderedComponent = renderer.create(
+    const Spy = jest.fn(() => null);
+    const SpyWithReducer = injectReducer({ key: 'test', reducer })(Spy);
+    render(
       <Provider store={store}>
-        <ComponentWithReducer {...props} />
+        <SpyWithReducer {...props} />
       </Provider>,
     );
-    const {
-      props: { children },
-    } = renderedComponent.getInstance();
 
-    expect(children.props).toEqual(props);
+    expect(Spy.mock.calls[0][0]).toEqual(props);
   });
 });
 
@@ -79,7 +77,7 @@ describe('useInjectReducer hook', () => {
       injectReducer: jest.fn(),
     };
     reducerInjectors.default = jest.fn().mockImplementation(() => injectors);
-    store = configureStore({}, memoryHistory);
+    store = setupStore();
     ComponentWithReducer = () => {
       useInjectReducer({ key: 'test', reducer });
       return null;

@@ -1,186 +1,89 @@
 /**
- * WalletLayer
+ * WalletLayer tests
  */
 
 import {
-  changeChannel,
-  joinChannel,
-  sendChat,
-  enableCaptcha,
-  disableCaptcha,
-  lockChannel,
-  unlockChannel,
-  inviteUser,
-  whisperUser,
-  ignoreUser,
-  kickUser,
-  banUser,
-  muteUser,
-  unmuteUser,
-  pushNotif,
-  clearNotifs,
+  connectWallet,
+  setSelectedAccount,
+  disconnectWallet,
+  cancelWaiting,
+  doTransfer,
+  signMessageRequest,
+  setAuthToken,
+  setActiveAccount,
+  signMessageSuccess,
+  signMessageFailure,
+  setPendingSignRequest,
+  checkChannelInfo,
 } from '../actions';
 import {
-  CHANGE_CHANNEL,
-  START_JOIN,
-  SEND_CHAT,
-  ENABLE_CAPTCHA,
-  DISABLE_CAPTCHA,
-  LOCK_CHANNEL,
-  UNLOCK_CHANNEL,
-  INVITE_USER,
-  WHISPER_USER,
-  IGNORE_USER,
-  KICK_USER,
-  BAN_USER,
-  MUTE_USER,
-  UNMUTE_USER,
-  PUSH_NOTIF,
-  CLEAR_NOTIFS,
+  CONNECT_WALLET,
+  CONNECT_ACCOUNT,
+  DISCONNECT_WALLET,
+  WAITING_ON_WALLET,
+  DO_TX,
+  SIGN_MESSAGE_REQUEST,
+  SET_AUTH_TOKEN,
+  SET_ACTIVE_ACCOUNT,
+  SIGN_MESSAGE_SUCCESS,
+  SIGN_MESSAGE_FAILURE,
+  SET_PENDING_SIGN_REQUEST,
+  CHECK_CHANNEL_INFO,
 } from '../constants';
 
 describe('WalletLayer actions', () => {
-  describe('Change current channel', () => {
-    it('has a type of CHANGE_CHANNEL', () => {
-      const expected = {
-        type: CHANGE_CHANNEL,
-      };
-      expect(changeChannel()).toEqual(expected);
+  it('builds connection actions', () => {
+    expect(connectWallet('Phantom')).toEqual({
+      type: CONNECT_WALLET,
+      name: 'Phantom',
+    });
+    expect(setSelectedAccount('acct')).toEqual({
+      type: CONNECT_ACCOUNT,
+      account: 'acct',
+    });
+    expect(setActiveAccount('acct')).toEqual({
+      type: SET_ACTIVE_ACCOUNT,
+      account: 'acct',
+    });
+    expect(disconnectWallet()).toEqual({ type: DISCONNECT_WALLET });
+    expect(cancelWaiting()).toEqual({
+      type: WAITING_ON_WALLET,
+      waiting: false,
     });
   });
 
-  describe('Initiate join', () => {
-    it('has a type of START_JOIN', () => {
-      const expected = {
-        type: START_JOIN,
-      };
-      expect(joinChannel()).toEqual(expected);
+  it('builds transaction and signing actions', () => {
+    expect(doTransfer('payload')).toEqual({
+      type: DO_TX,
+      encodedPayload: 'payload',
+    });
+    expect(signMessageRequest('wallet', 'msg')).toEqual({
+      type: SIGN_MESSAGE_REQUEST,
+      wallet: 'wallet',
+      message: 'msg',
+    });
+    expect(
+      signMessageSuccess({ signature: 'sig', signedMessage: 'msg' }),
+    ).toEqual({
+      type: SIGN_MESSAGE_SUCCESS,
+      signature: 'sig',
+      signedMessage: 'msg',
+    });
+    expect(signMessageFailure('nope')).toEqual({
+      type: SIGN_MESSAGE_FAILURE,
+      error: 'nope',
+    });
+    expect(setPendingSignRequest({ id: 1 })).toEqual({
+      type: SET_PENDING_SIGN_REQUEST,
+      payload: { id: 1 },
     });
   });
 
-  describe('Send channel message', () => {
-    it('has a type of SEND_CHAT', () => {
-      const expected = {
-        type: SEND_CHAT,
-      };
-      expect(sendChat()).toEqual(expected);
-    });
-  });
-
-  describe('Enabling captcha', () => {
-    it('has a type of ENABLE_CAPTCHA', () => {
-      const expected = {
-        type: ENABLE_CAPTCHA,
-      };
-      expect(enableCaptcha()).toEqual(expected);
-    });
-  });
-
-  describe('Disabling captcha', () => {
-    it('has a type of DISABLE_CAPTCHA', () => {
-      const expected = {
-        type: DISABLE_CAPTCHA,
-      };
-      expect(disableCaptcha()).toEqual(expected);
-    });
-  });
-
-  describe('Locking channel', () => {
-    it('has a type of LOCK_CHANNEL', () => {
-      const expected = {
-        type: LOCK_CHANNEL,
-      };
-      expect(lockChannel()).toEqual(expected);
-    });
-  });
-
-  describe('Unlocking channel', () => {
-    it('has a type of UNLOCK_CHANNEL', () => {
-      const expected = {
-        type: UNLOCK_CHANNEL,
-      };
-      expect(unlockChannel()).toEqual(expected);
-    });
-  });
-
-  describe('Inviting a user', () => {
-    it('has a type of INVITE_USER', () => {
-      const expected = {
-        type: INVITE_USER,
-      };
-      expect(inviteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Whispering a user', () => {
-    it('has a type of WHISPER_USER', () => {
-      const expected = {
-        type: WHISPER_USER,
-      };
-      expect(whisperUser()).toEqual(expected);
-    });
-  });
-
-  describe('Ignoring a user', () => {
-    it('has a type of IGNORE_USER', () => {
-      const expected = {
-        type: IGNORE_USER,
-      };
-      expect(ignoreUser()).toEqual(expected);
-    });
-  });
-
-  describe('Kicking a user', () => {
-    it('has a type of KICK_USER', () => {
-      const expected = {
-        type: KICK_USER,
-      };
-      expect(kickUser()).toEqual(expected);
-    });
-  });
-
-  describe('Banning a user', () => {
-    it('has a type of BAN_USER', () => {
-      const expected = {
-        type: BAN_USER,
-      };
-      expect(banUser()).toEqual(expected);
-    });
-  });
-
-  describe('Muting a user', () => {
-    it('has a type of MUTE_USER', () => {
-      const expected = {
-        type: MUTE_USER,
-      };
-      expect(muteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Unmuting a user', () => {
-    it('has a type of UNMUTE_USER', () => {
-      const expected = {
-        type: UNMUTE_USER,
-      };
-      expect(unmuteUser()).toEqual(expected);
-    });
-  });
-
-  describe('Adding a notification', () => {
-    it('has a type of PUSH_NOTIF', () => {
-      const expected = {
-        type: PUSH_NOTIF,
-      };
-      expect(pushNotif()).toEqual(expected);
-    });
-  });
-
-  describe('Clearning notifications', () => {
-    it('has a type of CLEAR_NOTIFS', () => {
-      const expected = {
-        type: CLEAR_NOTIFS,
-      };
-      expect(clearNotifs()).toEqual(expected);
+  it('builds misc actions', () => {
+    expect(setAuthToken('tok')).toEqual({ type: SET_AUTH_TOKEN, token: 'tok' });
+    expect(checkChannelInfo('lounge')).toEqual({
+      type: CHECK_CHANNEL_INFO,
+      channel: 'lounge',
     });
   });
 });

@@ -2,25 +2,35 @@
  * Main menu tests
  */
 
-// import { produce } from 'immer';
-import mainMenuReducer from '../reducer';
+import mainMenuReducer, { initialState } from '../reducer';
+import {
+  OPEN_MAINMENU,
+  CLOSE_MAINMENU,
+  OPEN_LOCALEMODAL,
+  CLOSE_LOCALEMODAL,
+} from '../constants';
 
-/* eslint-disable default-case, no-param-reassign */
 describe('mainMenuReducer', () => {
-  let state;
-  beforeEach(() => {
-    state = {
+  it('returns the initial state', () => {
+    expect(mainMenuReducer(undefined, {})).toEqual({
       mainMenuOpen: false,
-      usersModalOpen: false,
-      channelsModalOpen: false,
-      joinModalOpen: false,
-      joinModalChannel: false,
       localeModelOpen: false,
-    };
+    });
   });
 
-  it('returns the initial state', () => {
-    const expectedResult = state;
-    expect(mainMenuReducer(undefined, {})).toEqual(expectedResult);
+  it('opens and closes the main menu', () => {
+    const opened = mainMenuReducer(initialState, { type: OPEN_MAINMENU });
+    expect(opened.mainMenuOpen).toBe(true);
+    expect(mainMenuReducer(opened, { type: CLOSE_MAINMENU }).mainMenuOpen).toBe(
+      false,
+    );
+  });
+
+  it('opens and closes the locale modal', () => {
+    const opened = mainMenuReducer(initialState, { type: OPEN_LOCALEMODAL });
+    expect(opened.localeModelOpen).toBe(true);
+    expect(
+      mainMenuReducer(opened, { type: CLOSE_LOCALEMODAL }).localeModelOpen,
+    ).toBe(false);
   });
 });

@@ -5,10 +5,9 @@
  */
 
 import { produce } from 'immer';
-import { memoryHistory } from 'react-router-dom';
 import identity from 'lodash/identity';
 
-import configureStore from '../../configureStore';
+import setupStore from '../../setupStore';
 
 import getInjectors, { injectReducerFactory } from '../reducerInjectors';
 
@@ -29,7 +28,7 @@ describe('reducer injectors', () => {
 
   describe('getInjectors', () => {
     beforeEach(() => {
-      store = configureStore({}, memoryHistory);
+      store = setupStore();
     });
 
     it('should return injectors', () => {
@@ -49,7 +48,7 @@ describe('reducer injectors', () => {
 
   describe('injectReducer helper', () => {
     beforeEach(() => {
-      store = configureStore({}, memoryHistory);
+      store = setupStore();
       injectReducer = injectReducerFactory(store, true);
     });
 

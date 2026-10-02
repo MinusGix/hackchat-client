@@ -2,31 +2,40 @@
  * Test internationalization
  */
 
-import { formatTranslationMessages } from '../i18n';
+import { appLocales, translationMessages } from '../i18n';
 
 jest.mock('../translations/en.json', () => ({
-  message1: `ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn`,
-  message2: 'uWu Test me daddy',
+  message1: 'English one',
+  message2: 'English two',
 }));
 
-const cthulhuTranslationMessages = {
-  message1: 'Get ready for some shokushu zeme',
+jest.mock('../translations/de.json', () => ({
+  message1: 'Deutsch eins',
   message2: '',
-};
+}));
 
-describe('formatTranslationMessages', () => {
-  it('should build only defaults when DEFAULT_LOCALE', () => {
-    const result = formatTranslationMessages('en', { a: 'a' });
-
-    expect(result).toEqual({ a: 'a' });
+describe('translationMessages', () => {
+  it('should provide messages for every supported locale', () => {
+    appLocales.forEach((locale) => {
+      expect(translationMessages).toHaveProperty([locale]);
+    });
   });
 
-  it('should combine default locale and current locale when not DEFAULT_LOCALE', () => {
-    const result = formatTranslationMessages('', cthulhuTranslationMessages);
+  it('should use the English messages as-is for the default locale', () => {
+    expect(translationMessages.en).toEqual(
+      expect.objectContaining({
+        message1: 'English one',
+        message2: 'English two',
+      }),
+    );
+  });
 
-    expect(result).toEqual({
-      message1: 'Get ready for some shokushu zeme',
-      message2: 'uWu Test me daddy',
-    });
+  it('should fall back to English for missing translations', () => {
+    expect(translationMessages.de).toEqual(
+      expect.objectContaining({
+        message1: 'Deutsch eins',
+        message2: 'English two',
+      }),
+    );
   });
 });
