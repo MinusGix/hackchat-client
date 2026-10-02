@@ -4,9 +4,8 @@
 
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 
-import { selectSettingsPageDomain } from '../../containers/SettingsPage/selectors';
+import { useDisplaySettings } from 'utils/displaySettings';
 import messages from './messages';
 
 import MessageContainer from './MessageContainer';
@@ -39,12 +38,8 @@ const ChatMessage = ({
     [msgForm, payload.content],
   );
 
-  const doHighlight = useSelector(
-    (state) => selectSettingsPageDomain(state).highlightMentions ?? true,
-  );
-  const myUsername = useSelector(
-    (state) => selectSettingsPageDomain(state).username ?? '',
-  );
+  const { highlightMentions: doHighlight, username: myUsername } =
+    useDisplaySettings();
 
   let isMentioned = false;
   if (doHighlight && myUsername && payload.content) {

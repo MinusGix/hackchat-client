@@ -14,6 +14,7 @@ import { ThemeProvider } from 'styled-components';
 import HomePage from 'containers/HomePage/Loadable';
 import SettingsPage from 'containers/SettingsPage/Loadable';
 import ToastNotifier from 'containers/ToastNotifier';
+import { DisplaySettingsProvider } from 'utils/displaySettings';
 
 import { makeSelectCachedTheme } from 'containers/SettingsPage/selectors';
 import defaultThemeObj from '../../themes/default';
@@ -61,10 +62,12 @@ function App({ cachedTheme }) {
           />
         </Helmet>
 
-        <Routes>
-          <Route exact path="/settings" Component={SettingsPage} />
-          <Route path="*" Component={HomePage} />
-        </Routes>
+        <DisplaySettingsProvider>
+          <Routes>
+            <Route exact path="/settings" Component={SettingsPage} />
+            <Route path="*" Component={HomePage} />
+          </Routes>
+        </DisplaySettingsProvider>
 
         <ToastNotifier />
         <ToastContainer

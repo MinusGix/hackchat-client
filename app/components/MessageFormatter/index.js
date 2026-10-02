@@ -7,7 +7,6 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Remarkable } from 'remarkable';
 import RemarkableReactRenderer from 'remarkable-react';
 import { linkify } from 'remarkable/linkify';
@@ -16,7 +15,7 @@ import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import { InlineMath, BlockMath } from 'react-katex';
 
-import { selectSettingsPageDomain } from '../../containers/SettingsPage/selectors';
+import { useDisplaySettings } from 'utils/displaySettings';
 
 import SpoilerWrapper from './SpoilerWrapper';
 
@@ -54,12 +53,8 @@ MessageFormatter.core.ruler.disable(['abbr']);
 MessageFormatter.inline.ruler.disable(['sup']);
 
 const MarkdownImage = ({ alt, src, title }) => {
-  const loadSafe = useSelector(
-    (state) => selectSettingsPageDomain(state).loadSafeImages ?? true,
-  );
-  const loadUnsafe = useSelector(
-    (state) => selectSettingsPageDomain(state).loadUnsafeImages ?? false,
-  );
+  const { loadSafeImages: loadSafe, loadUnsafeImages: loadUnsafe } =
+    useDisplaySettings();
 
   let isSafeHost = false;
   try {
@@ -121,17 +116,13 @@ const MarkdownImage = ({ alt, src, title }) => {
 };
 
 const KatexInlineComponent = ({ content }) => {
-  const allowKatex = useSelector(
-    (state) => selectSettingsPageDomain(state).allowKatex ?? true,
-  );
+  const { allowKatex } = useDisplaySettings();
   if (!allowKatex) return <span>${content}$</span>;
   return <InlineMath>{content}</InlineMath>;
 };
 
 const KatexBlockComponent = ({ content }) => {
-  const allowKatex = useSelector(
-    (state) => selectSettingsPageDomain(state).allowKatex ?? true,
-  );
+  const { allowKatex } = useDisplaySettings();
   if (!allowKatex) return <span>$${content}$$</span>;
   return <BlockMath>{content}</BlockMath>;
 };
@@ -171,9 +162,7 @@ const ExternalCodeComponent = ({ content, params: language }) => {
 };
 
 const MarkdownElement = ({ tag: Tag, prefix = '', suffix = '', children }) => {
-  const allowMarkdown = useSelector(
-    (state) => selectSettingsPageDomain(state).allowMarkdown ?? true,
-  );
+  const { allowMarkdown } = useDisplaySettings();
 
   if (!allowMarkdown) {
     return (
